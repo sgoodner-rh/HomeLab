@@ -1,0 +1,35 @@
+---
+- name: Homelab Defaults
+  hosts: all
+  become: true
+
+  tasks:
+
+  - name: Create my admin user
+    user:
+      name: homelabadmin
+      password: '$6$MsCUJIJ7$cvu0CBIuF9TO4.ZEwbHnN885CsyehsT9xqqCGMgmVACBVkalX8W3SnRLtymycL9DN8RvbAqtBRi2YJl1E5Ssp0'
+      state: present
+      groups: wheel
+
+  - name: Set Authorized key
+    authorized_key:
+      user: homelabadmin
+      state: present
+      key: "{{ lookup('file', 'homelabadmin_id_rsa.pub') }}"
+      #In this form the file just needs to be in the same directory as the playbook
+
+  - name: Stop and disable the firewalld service
+    service:
+      name: firewalld
+      state: stopped
+      enabled: no
+
+  - name: Make sure standard packages are installed
+    yum:
+      name:
+       - net-tools
+       - bind-utils
+       - katello-agent
+      state: present
+      update_cache: true
