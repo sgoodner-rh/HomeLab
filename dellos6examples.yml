@@ -1,0 +1,15 @@
+---
+- name: Dell OS6 examples
+  hosts: all
+  become: true
+
+  tasks:
+
+  # Collect all facts from the device
+  - name: get all dellos6_facts
+    dellos6_facts:
+      gather_subset: all
+
+  - name: run show version on remote devices
+    dellos6_command:
+      commands: show version
