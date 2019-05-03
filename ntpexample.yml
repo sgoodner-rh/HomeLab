@@ -1,0 +1,28 @@
+---
+- name: DOH NTP Settings
+  hosts: all
+  become: true
+
+  tasks:
+
+  - name: Install NTP
+    yum: name=ntp state=installed
+    tags: ntp
+
+  - name: Copy over the NTP configuration
+    template: src=./ntp.conf dest=/etc/ntp.conf
+    notify:
+    - restart ntpd
+    tags: ntp
+
+  - name: Make sure NTP is started up
+    service: name=ntpd state=running enabled=yes
+    tags: ntp
+
+  - name: Sync hwclock
+    shell: hwclock -w
+    tags: ntp
+
+  handlers:
+  - name: restart ntpd
+    service: name=ntpd state=restarted
